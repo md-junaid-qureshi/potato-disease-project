@@ -4,26 +4,39 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 import os
+import io
 
 app = FastAPI()
 
-# Model loading logic (Direct from folder, no bucket needed)
-# MODEL = tf.keras.models.load_model("./potatoes.h5")      #old line thi ye rendor pe error ari thi niche wali new dal di hai
+# Model load (compile=False is necessary for older h5 models)
 MODEL = tf.keras.models.load_model("./potatoes.h5", compile=False)
 CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
 
+@app.get("/ping")
+async def ping():
+    return "Hello, Server is Running!"
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    # Image processing logic as per tutorial
-    image = np.array(Image.open(file.file).convert("RGB").resize((256, 256)))
-    image = image / 255.0
-    img_array = tf.expand_dims(image, 0)
+    # 1. Image read aur resize
+    image_data = await file.read()
+    image = Image.open(io.BytesIO(image_data)).convert("RGB").resize((256, 256))
     
-    predictions = MODEL.predict(img_array)
-    predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
-    confidence = round(100 * (np.max(predictions[0])), 2)
+    # 2. Preprocess (Scaling)
+    img_array = np.array(image) / 255.0
+    img_array = np.expand_dims(img_array, 0)
 
-    return {"class": predicted_class, "confidence": confidence}
+    # 3. Prediction
+    predictions = MODEL.predict(img_array)
+    
+    # Sabse zaroori: .tolist() ya float() use karna taaki JSON error na aaye
+    predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
+    confidence = float(np.max(predictions[0])) # numpy.float32 ko Python float banaya
+
+    return {
+        "class": predicted_class,
+        "confidence": round(confidence * 100, 2)
+    }
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
