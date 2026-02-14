@@ -8,7 +8,8 @@ import os
 app = FastAPI()
 
 # Model loading logic (Direct from folder, no bucket needed)
-MODEL = tf.keras.models.load_model("./potatoes.h5")
+# MODEL = tf.keras.models.load_model("./potatoes.h5")      #old line thi ye rendor pe error ari thi niche wali new dal di hai
+MODEL = tf.keras.models.load_model("./potatoes.h5", compile=False)
 CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
 
 @app.post("/predict")
