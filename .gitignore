@@ -1,0 +1,15 @@
+# Ignore Python virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore local system files
+.DS_Store
+Thumbs.db
+
+# Ignore training data (kyunki ye bahut bada hota hai)
+training/PlantVillage/
