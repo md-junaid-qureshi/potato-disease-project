@@ -13,3 +13,7 @@ Thumbs.db
 
 # Ignore training data (kyunki ye bahut bada hota hai)
 training/PlantVillage/
+
+
+.env
+android/app/build/
