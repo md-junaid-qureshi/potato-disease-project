@@ -8,10 +8,15 @@ import tensorflow as tf
 
 app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-]
+# origins = [
+#     "http://localhost",
+#     "http://localhost:3000",
+# ]
+
+# Isse saari websites ko permission mil jayegi, CORS ka lafda khatam ho jayega
+origins = ["*"]
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
