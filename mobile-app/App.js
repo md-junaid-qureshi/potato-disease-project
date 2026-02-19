@@ -21,8 +21,8 @@ import PermissionsService, {isIOS} from './Permissions';
 // --- FIXED URL ---
 // Maine yahan direct aapka IP daal diya hai
 // const FINAL_API_URL = "http://10.38.79.208:8000/predict";
-const FINAL_API_URL = "https://potato-disease-api-wd08.onrender.com/predict";
-
+// const FINAL_API_URL = "https://potato-disease-api-wd08.onrender.com/predict";      #ye Direct Bypass tha esko comment karke mene .env me dal dia hai
+const FINAL_API_URL = Config.URL || "https://potato-disease-api-wd08.onrender.com/predict";
 axios.interceptors.request.use(
   async config => {
     let request = config;
