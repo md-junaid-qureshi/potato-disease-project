@@ -289,7 +289,6 @@
 // };
 
 
-
 import { useState, useEffect } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -307,7 +306,6 @@ import { common } from '@material-ui/core/colors';
 import Clear from '@material-ui/icons/Clear';
 
 // --- FIXED URL FOR WEBSITE ---
-// Humne yahan direct Render ka link daal diya hai taaki koi confusion na ho
 const FINAL_API_URL = "https://potato-disease-api-wd08.onrender.com/predict";
 
 const ColorButton = withStyles((theme) => ({
@@ -397,12 +395,13 @@ export const ImageUpload = () => {
       let formData = new FormData();
       formData.append("file", selectedFile);
       
-      // Yahan humne process.env hata kar FINAL_API_URL use kiya hai
       try {
+        // Headers add karna bahut zaroori tha HTTPS ke liye
         let res = await axios({
           method: "post",
           url: FINAL_API_URL, 
           data: formData,
+          headers: { "Content-Type": "multipart/form-data" },
         });
         if (res.status === 200) {
           setData(res.data);
