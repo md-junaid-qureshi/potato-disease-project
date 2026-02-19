@@ -401,7 +401,8 @@ export const ImageUpload = () => {
           method: "post",
           url: FINAL_API_URL, 
           data: formData,
-          headers: { "Content-Type": "multipart/form-data" },
+          // headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data", "Access-Control-Allow-Origin": "*" },
         });
         if (res.status === 200) {
           setData(res.data);
