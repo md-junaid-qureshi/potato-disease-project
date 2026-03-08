@@ -306,7 +306,8 @@ import { common } from '@material-ui/core/colors';
 import Clear from '@material-ui/icons/Clear';
 
 // --- FIXED URL FOR WEBSITE ---
-const FINAL_API_URL = "https://potato-disease-api-wd08.onrender.com/predict";
+// const FINAL_API_URL = "https://potato-disease-api-wd08.onrender.com/predict";
+const FINAL_API_URL = "http://localhost:8000/predict";
 
 const ColorButton = withStyles((theme) => ({
   root: {

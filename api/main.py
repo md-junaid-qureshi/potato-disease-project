@@ -1,4 +1,66 @@
-# from fastapi import FastAPI, File, UploadFile
+# from fastapi import FastAPI, File, UploadFilfrom fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import numpy as np
+from io import BytesIO
+from PIL import Image
+import tensorflow as tf
+import os
+
+app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Render path fix
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "saved_models", "1")
+MODEL = tf.keras.models.load_model(MODEL_PATH)
+
+CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
+
+@app.get("/ping")
+async def ping():
+    return "Hello, I am alive"
+
+def read_file_as_image(data) -> np.ndarray:
+    # Image open karo
+    image = Image.open(BytesIO(data))
+    # 1. Resize: Model ke input size (256x256) ke mutabiq
+    image = image.resize((256, 256))
+    return np.array(image)
+
+@app.post("/predict")
+async def predict(
+    file: UploadFile = File(...)
+):
+    image = read_file_as_image(await file.read())
+    
+    # 2. Scaling/Normalization: Pixels ko 0-1 range mein laane ke liye
+    img_batch = np.expand_dims(image, 0) / 255.0
+    
+    predictions = MODEL.predict(img_batch)
+
+    predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
+    confidence = np.max(predictions[0])
+    return {
+        'class': predicted_class,
+        'confidence': float(confidence)
+    }
+
+if __name__ == "__main__":
+    # Render dynamic port support
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host='0.0.0.0', port=port)
+
+# ===================================================
+
 # from fastapi.middleware.cors import CORSMiddleware
 # import uvicorn
 # import numpy as np
@@ -32,6 +94,10 @@
 # @app.get("/ping")
 # async def ping():
 #     return "Hello, I am alive"
+
+# @app.get("/")
+# async def root():
+#     return {"message": "Welcome to Potato Disease API"}
 
 # def read_file_as_image(data) -> np.ndarray:
 #     image = np.array(Image.open(BytesIO(data)))
@@ -121,55 +187,55 @@
 
 # =============================================================original
 
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
-import numpy as np
-from io import BytesIO
-from PIL import Image
-import tensorflow as tf
+# from fastapi import FastAPI, File, UploadFile
+# from fastapi.middleware.cors import CORSMiddleware
+# import uvicorn
+# import numpy as np
+# from io import BytesIO
+# from PIL import Image
+# import tensorflow as tf
 
-app = FastAPI()
+# app = FastAPI()
 
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# origins = [
+#     "http://localhost",
+#     "http://localhost:3000",
+# ]
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
-MODEL = tf.keras.models.load_model("../saved_models/1")
+# MODEL = tf.keras.models.load_model("../saved_models/1")
 
-CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
+# CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
 
-@app.get("/ping")
-async def ping():
-    return "Hello, I am alive"
+# @app.get("/ping")
+# async def ping():
+#     return "Hello, I am alive"
 
-def read_file_as_image(data) -> np.ndarray:
-    image = np.array(Image.open(BytesIO(data)))
-    return image
+# def read_file_as_image(data) -> np.ndarray:
+#     image = np.array(Image.open(BytesIO(data)))
+#     return image
 
-@app.post("/predict")
-async def predict(
-    file: UploadFile = File(...)
-):
-    image = read_file_as_image(await file.read())
-    img_batch = np.expand_dims(image, 0)
+# @app.post("/predict")
+# async def predict(
+#     file: UploadFile = File(...)
+# ):
+#     image = read_file_as_image(await file.read())
+#     img_batch = np.expand_dims(image, 0)
     
-    predictions = MODEL.predict(img_batch)
+#     predictions = MODEL.predict(img_batch)
 
-    predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
-    confidence = np.max(predictions[0])
-    return {
-        'class': predicted_class,
-        'confidence': float(confidence)
-    }
+#     predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
+#     confidence = np.max(predictions[0])
+#     return {
+#         'class': predicted_class,
+#         'confidence': float(confidence)
+#     }
 
-if __name__ == "__main__":
-    uvicorn.run(app, host='localhost', port=8000)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host='localhost', port=8000)

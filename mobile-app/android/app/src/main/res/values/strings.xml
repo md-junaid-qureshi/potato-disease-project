@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">mlDemo</string>
+    <!-- <string name="app_name">mlDemo</string> -->
+    <string name="app_name">LeafScan</string>
 </resources>
